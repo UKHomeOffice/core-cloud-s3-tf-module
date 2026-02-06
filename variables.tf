@@ -107,3 +107,18 @@ variable "iam_role" {
   type        = string
   description = "Name of the role. If omitted, Terraform will assign a random, unique name"
 }
+
+variable "inline_policy_name" {
+  type        = string
+  description = "Name of the role policy."
+
+  validation {
+    condition     = length(var.inline_policy_name) >= 1 && length(var.inline_policy_name) <= 256
+    error_message = "The inline_policy_name must be less than 256 characters."
+  }
+}
+
+variable "iam_role_policy_name" {
+  type        = string
+  description = "Name of the IAM Role Policy."
+}

@@ -169,7 +169,7 @@ resource "aws_iam_role_policy" "cc_s3_policy" {
 
 
 resource "aws_s3_bucket_replication_configuration" "cc_bucket_replication_rule" {
-  depends_on = [aws_s3_bucket_versioning.versioning_rules]
+  depends_on = [aws_s3_bucket_versioning.this]
   bucket     = aws_s3_bucket.this.id
   role       = aws_iam_role.cc_s3_role.arn
   rule {
