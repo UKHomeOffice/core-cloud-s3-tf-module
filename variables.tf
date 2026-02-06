@@ -112,3 +112,25 @@ variable "iam_role_policy_name" {
   type        = string
   description = "Name of the IAM Role Policy."
 }
+
+variable "logging_bucket_name" {
+  type        = string
+  description = "Name of the S3 bucket for logs."
+}
+
+variable "env" {
+  type        = string
+  description = "Name of the environment."
+}
+
+variable "enable_access_logs_bucket" {
+  type        = bool
+  default     = true
+  description = "Whether s3 server access logging should be enabled."
+}
+
+variable "s3_access_logs_bucket_name" {
+  type        = string
+  default     = "s3-access-logs"
+  description = "Name of the s3 bucket to store access logs."
+}

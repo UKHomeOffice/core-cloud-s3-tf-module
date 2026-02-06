@@ -194,6 +194,15 @@ resource "aws_s3_bucket_replication_configuration" "cc_bucket_replication_rule" 
   }
 }
 
+resource "aws_s3_bucket_logging" "bucket_logging" {
+  count = var.enable_access_logs_bucket ? 1 : 0
+
+  bucket = aws_s3_bucket.this.id
+
+  target_bucket = "${var.s3_access_logs_bucket_name}-${var.env}"
+  target_prefix = "${var.bucket_name}/"
+}
+
 locals {
   common_tags = merge(
     {
