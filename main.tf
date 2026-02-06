@@ -148,13 +148,7 @@ resource "aws_iam_role_policy" "cc_s3_policy" {
           "s3:GetReplicationConfiguration",
           "s3:ListBucket",
           "s3:GetObjectVersionForReplication",
-          "s3:GetObjectVersionAcl"
-        ],
-        "Resource" : "${aws_s3_bucket.this.arn}",
-        "Effect" : "Allow"
-      },
-      {
-        "Action" : [
+          "s3:GetObjectVersionAcl",
           "s3:ReplicateObject",
           "s3:ReplicateDelete",
           "s3:ReplicateTags",

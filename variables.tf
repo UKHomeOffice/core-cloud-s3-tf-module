@@ -113,11 +113,6 @@ variable "iam_role_policy_name" {
   description = "Name of the IAM Role Policy."
 }
 
-variable "logging_bucket_name" {
-  type        = string
-  description = "Name of the S3 bucket for logs."
-}
-
 variable "env" {
   type        = string
   description = "Name of the environment."
