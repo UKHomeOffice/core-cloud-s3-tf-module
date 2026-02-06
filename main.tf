@@ -1,0 +1,150 @@
+resource "aws_kms_key" "s3" {
+  description             = "KMS key for S3 bucket encryption"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+
+  tags = local.common_tags
+}
+
+resource "aws_kms_key_policy" "bucket_kms_policy" {
+  key_id = aws_kms_key.s3.id
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Id" : "bucket_kms_policy",
+    "Statement" : [
+      {
+        "Sid" : "EnableIAMUserPermissions",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::${var.tags.account-code}:root"
+        },
+        "Action" : "kms:*",
+        "Resource" : "*"
+      }
+    ]
+  })
+}
+
+resource "aws_kms_alias" "s3" {
+  name          = "alias/${var.kms_alias}"
+  target_key_id = aws_kms_key.s3.id
+}
+
+resource "aws_sns_topic" "event_topic" {
+  name = "s3-event-notification-topic"
+  kms_master_key_id = "alias/aws/sns"
+
+  policy = <<POLICY
+{
+    "Version":"2012-10-17",
+    "Statement":[{
+        "Effect": "Allow",
+        "Principal": {"AWS":"*"},
+        "Action": "SNS:Publish",
+        "Resource": "arn:aws:sns:${var.region}:${var.tags.account-code}:s3-event-notification-topic",
+        "Condition":{
+            "ArnLike":{"aws:SourceArn":"${aws_s3_bucket.this.arn}"}
+        }
+    }]
+}
+POLICY
+}
+
+data "aws_iam_policy_document" "bucket_iam_policy" {
+  statement {
+    principals {
+      identifiers = ["logging.s3.amazonaws.com"]
+      type        = "Service"
+    }
+    actions   = [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject"
+      ]
+    resources = ["${aws_s3_bucket.this.arn}/*"]
+  }
+}
+
+resource "aws_s3_bucket" "this" {
+  bucket = "${var.project_name}-${var.bucket_name}-${var.environment}"
+  tags   = local.common_tags
+}
+
+resource "aws_s3_bucket_versioning" "this" {
+  bucket = aws_s3_bucket.this.id
+  versioning_configuration {
+    status = var.enable_versioning ? "Enabled" : "Suspended"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
+  bucket = aws_s3_bucket.this.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = var.encryption_type == "aws:kms" ? aws_kms_key.s3.arn : null
+      sse_algorithm     = var.encryption_type
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "this" {
+  bucket = aws_s3_bucket.this.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_notification" "bucket_notification" {
+  bucket = aws_s3_bucket.this.id
+
+  topic {
+    topic_arn     = aws_sns_topic.event_topic.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".log"
+  }
+}
+
+resource "aws_s3_bucket_policy" "logging" {
+  bucket = aws_s3_bucket.this.bucket
+  policy = data.aws_iam_policy_document.bucket_policy.json
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "this" {
+  bucket = aws_s3_bucket.this.id
+
+  rule {
+    id     = "cc-bucket-lifecycle-rule"
+    status = "Enabled"
+
+    expiration {
+      days = var.lifecycle_expiration_days
+    }
+  }
+
+  rule {
+    id     = "cc-abort-incomplete-multipart-uploads"
+    status = "Enabled"
+
+    # No filter → applies to all multipart uploads
+    filter {}
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = var.days_after_initiation
+    }
+  }
+}
+
+locals {
+  common_tags = merge(
+    {
+      Environment = var.environment
+      Project     = var.project_name
+      ManagedBy   = "terraform"
+      source-repo = var.source-repo
+    },
+    var.tags
+  )
+}
