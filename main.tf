@@ -56,6 +56,15 @@ resource "aws_s3_bucket" "this" {
   tags   = local.common_tags
 }
 
+resource "aws_s3_bucket_public_access_block" "this" {
+  bucket = aws_s3_bucket.this.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 resource "aws_s3_bucket_versioning" "this" {
   bucket = aws_s3_bucket.this.id
   versioning_configuration {
@@ -72,15 +81,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
       sse_algorithm     = var.encryption_type
     }
   }
-}
-
-resource "aws_s3_bucket_public_access_block" "this" {
-  bucket = aws_s3_bucket.this.id
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
 }
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
@@ -193,7 +193,7 @@ resource "aws_s3_bucket_logging" "bucket_logging" {
 
   bucket = aws_s3_bucket.this.id
 
-  target_bucket = "${var.s3_access_logs_bucket_name}-${var.env}"
+  target_bucket = "${var.project_name}-${var.s3_access_logs_bucket_name}-${var.env}"
   target_prefix = "${var.bucket_name}/"
 }
 
