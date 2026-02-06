@@ -33,7 +33,7 @@ resource "aws_kms_alias" "s3" {
 resource "aws_sns_topic" "event_topic" {
   name              = "s3-event-notification-topic"
   kms_master_key_id = "alias/aws/sns"
-  tags = local.common_tags
+  tags              = local.common_tags
 
   policy = <<POLICY
 {
@@ -50,7 +50,6 @@ resource "aws_sns_topic" "event_topic" {
 }
 POLICY
 }
-
 
 resource "aws_s3_bucket" "this" {
   bucket = "${var.project_name}-${var.bucket_name}-${var.environment}"
@@ -116,6 +115,82 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
     abort_incomplete_multipart_upload {
       days_after_initiation = var.days_after_initiation
     }
+  }
+}
+
+resource "aws_iam_role" "cc_s3_role" {
+  name = var.iam_role
+  tags = local.common_tags
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Action" : "sts:AssumeRole",
+        "Principal" : {
+          "Service" : "s3.amazonaws.com"
+        },
+        "Effect" : "Allow",
+        "Sid" : ""
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "cc_s3_policy" {
+  name = var.iam_role_policy_name
+  role = aws_iam_role.cc_s3_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        "Action" : [
+          "s3:GetReplicationConfiguration",
+          "s3:ListBucket",
+          "s3:GetObjectVersionForReplication",
+          "s3:GetObjectVersionAcl"
+        ],
+        "Resource" : "${aws_s3_bucket.this.arn}",
+        "Effect" : "Allow"
+      },
+      {
+        "Action" : [
+          "s3:ReplicateObject",
+          "s3:ReplicateDelete",
+          "s3:ReplicateTags",
+          "s3:GetObjectVersionTagging"
+        ],
+        "Resource" : "${aws_s3_bucket.this.arn}/*",
+        "Effect" : "Allow"
+      }
+    ]
+  })
+}
+
+
+resource "aws_s3_bucket_replication_configuration" "cc_bucket_replication_rule" {
+  depends_on = [aws_s3_bucket_versioning.versioning_rules]
+  bucket     = aws_s3_bucket.this.id
+  role       = aws_iam_role.cc_s3_role.arn
+  rule {
+    id = var.replication_rule
+
+    filter {}
+
+    destination {
+      bucket        = var.destination_bucket
+      storage_class = "STANDARD"
+
+      metrics {
+        status = "Enabled"
+      }
+    }
+
+    delete_marker_replication {
+      status = "Enabled"
+    }
+
+    status = "Enabled"
   }
 }
 

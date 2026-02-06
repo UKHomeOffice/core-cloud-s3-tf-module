@@ -82,3 +82,28 @@ variable "days_after_initiation" {
   default     = 15
   type        = number
 }
+
+variable "replication_rule" {
+  type        = string
+  description = "The name of the replication rule applied to S3"
+
+  validation {
+    condition     = length(var.replication_rule) >= 1 && length(var.replication_rule) <= 256
+    error_message = "The replication_rule name must be less than 256 characters."
+  }
+}
+
+variable "destination_bucket" {
+  type        = string
+  description = "The ARN of the existing s3 bucket to replicate generated reports to."
+
+  validation {
+    condition     = length(var.destination_bucket) >= 1 && length(var.destination_bucket) <= 256
+    error_message = "The destination_bucket ARN must be less than 256 characters."
+  }
+}
+
+variable "iam_role" {
+  type        = string
+  description = "Name of the role. If omitted, Terraform will assign a random, unique name"
+}
