@@ -197,6 +197,33 @@ resource "aws_s3_bucket_logging" "bucket_logging" {
   target_prefix = "${var.bucket_name}/"
 }
 
+data "aws_iam_policy_document" "cc_https_policy" {
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    effect = "Deny"
+    actions = [
+      "s3:*"
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values    = ["false"]
+    }
+    resources = [
+      "${aws_s3_bucket.this.arn}/*",
+    ]
+  }
+}
+
+resource "aws_s3_bucket_policy" "cc_deny_http" {
+  bucket = aws_s3_bucket.this.id
+  policy = data.aws_iam_policy_document.cc_https_policy.json
+}
+
+
 locals {
   common_tags = merge(
     {
