@@ -31,7 +31,7 @@ resource "aws_kms_alias" "s3" {
 }
 
 resource "aws_sns_topic" "event_topic" {
-  name = "s3-event-notification-topic"
+  name              = "s3-event-notification-topic"
   kms_master_key_id = "alias/aws/sns"
 
   policy = <<POLICY
@@ -50,20 +50,6 @@ resource "aws_sns_topic" "event_topic" {
 POLICY
 }
 
-data "aws_iam_policy_document" "bucket_iam_policy" {
-  statement {
-    principals {
-      identifiers = ["logging.s3.amazonaws.com"]
-      type        = "Service"
-    }
-    actions   = [
-        "s3:GetObject",
-        "s3:PutObject",
-        "s3:DeleteObject"
-      ]
-    resources = ["${aws_s3_bucket.this.arn}/*"]
-  }
-}
 
 resource "aws_s3_bucket" "this" {
   bucket = "${var.project_name}-${var.bucket_name}-${var.environment}"
@@ -105,11 +91,6 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
     events        = ["s3:ObjectCreated:*"]
     filter_suffix = ".log"
   }
-}
-
-resource "aws_s3_bucket_policy" "logging" {
-  bucket = aws_s3_bucket.this.bucket
-  policy = data.aws_iam_policy_document.bucket_policy.json
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "this" {
