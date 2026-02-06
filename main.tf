@@ -210,7 +210,7 @@ data "aws_iam_policy_document" "cc_https_policy" {
     condition {
       test     = "Bool"
       variable = "aws:SecureTransport"
-      values    = ["false"]
+      values   = ["false"]
     }
     resources = [
       "${aws_s3_bucket.this.arn}/*",
