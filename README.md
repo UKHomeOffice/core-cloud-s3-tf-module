@@ -21,7 +21,7 @@ Terraform validate, Terraform fmt, TFLint, Checkov scan, Sonarqube scan and Sema
 <strong>---| [README.md](https://github.com/UKHomeOffice/core-cloud-s3-tf-module/blob/CCL-7090/README.md)</strong>  \
 <strong>---| [main.tf](https://github.com/UKHomeOffice/core-cloud-s3-tf-module/blob/CCL-7090/main.tf)</strong> - Contains the main set of configuration for this module.  \
 <strong>---| [outputs.tf](https://github.com/UKHomeOffice/core-cloud-s3-tf-module/blob/CCL-7090/outputs.tf)</strong> - Contain the output definitions for this module.  \
-<strong>---| [variables.tf](https://github.com/UKHomeOffice/core-cloud-s3-tf-module/blob/CCL-7090/variables.tf</strong> - Contains the declarations for module variables, all variables have a defined type and short description outlining their purpose.  \
+<strong>---| [variables.tf](https://github.com/UKHomeOffice/core-cloud-s3-tf-module/blob/CCL-7090/variables.tf)</strong> - Contains the declarations for module variables, all variables have a defined type and short description outlining their purpose.  \
 <strong>---| [versions.tf](https://github.com/UKHomeOffice/core-cloud-s3-tf-module/blob/CCL-7090/versions.tf)</strong> - Contains the providers needed by the module.  
 
 ## Terraform Tests
