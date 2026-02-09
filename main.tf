@@ -89,7 +89,7 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
 
   topic {
     topic_arn     = aws_sns_topic.event_topic.arn
-    events        = ["s3:ObjectCreated:*"]
+    events        = ["s3:ObjectCreated:*", "s3:ObjectRemoved:*"]
     filter_suffix = ".log"
   }
 }
