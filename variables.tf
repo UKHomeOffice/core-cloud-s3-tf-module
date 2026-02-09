@@ -128,3 +128,9 @@ variable "s3_access_logs_bucket_name" {
   default     = "s3-access-logs"
   description = "Name of the s3 bucket to store access logs."
 }
+
+variable "mfa_delete" {
+  type        = bool
+  default     = false
+  description = "Enable MFA delete for either changing the versioning state of your bucket or permanently deleting an object version."
+}
