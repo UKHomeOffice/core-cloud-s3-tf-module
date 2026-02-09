@@ -16,7 +16,7 @@ resource "aws_kms_key_policy" "bucket_kms_policy" {
         "Sid" : "EnableIAMUserPermissions",
         "Effect" : "Allow",
         "Principal" : {
-          "AWS" : "arn:aws:iam::${var.tags.account-code}:root"
+          "AWS" : "arn:aws:iam::${var.account-code}:root"
         },
         "Action" : "kms:*",
         "Resource" : "*"
@@ -42,7 +42,7 @@ resource "aws_sns_topic" "event_topic" {
         "Effect": "Allow",
         "Principal": {"AWS":"*"},
         "Action": "SNS:Publish",
-        "Resource": "arn:aws:sns:${var.region}:${var.tags.account-code}:s3-event-notification-topic",
+        "Resource": "arn:aws:sns:${var.region}:${var.account-code}:s3-event-notification-topic",
         "Condition":{
             "ArnLike":{"aws:SourceArn":"${aws_s3_bucket.this.arn}"}
         }
@@ -227,10 +227,11 @@ resource "aws_s3_bucket_policy" "cc_deny_http" {
 locals {
   common_tags = merge(
     {
-      Environment = var.environment
-      Project     = var.project_name
-      ManagedBy   = "terraform"
-      source-repo = var.source-repo
+      environment  = var.environment
+      project      = var.project_name
+      ManagedBy    = "terraform"
+      source-repo  = var.source-repo
+      account-code = var.account-code
     },
     var.tags
   )

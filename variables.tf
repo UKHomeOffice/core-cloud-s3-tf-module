@@ -41,7 +41,6 @@ variable "tags" {
   validation {
     condition = alltrue([
       contains(keys(var.tags), "cost-centre"),
-      contains(keys(var.tags), "account-code"),
       contains(keys(var.tags), "portfolio-id"),
       contains(keys(var.tags), "project-id"),
       contains(keys(var.tags), "portfolio-id"),
@@ -67,6 +66,11 @@ variable "encryption_type" {
 }
 
 variable "source-repo" {
+  description = "The GitHub repository that made the AWS S3"
+  type        = string
+}
+
+variable "account-code" {
   description = "The GitHub repository that made the AWS S3"
   type        = string
 }
