@@ -117,11 +117,6 @@ variable "iam_role_policy_name" {
   description = "Name of the IAM Role Policy."
 }
 
-variable "env" {
-  type        = string
-  description = "Name of the environment."
-}
-
 variable "enable_access_logs_bucket" {
   type        = bool
   default     = true

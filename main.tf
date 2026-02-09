@@ -52,7 +52,7 @@ POLICY
 }
 
 resource "aws_s3_bucket" "this" {
-  bucket = "${var.project_name}-${var.bucket_name}-${var.environment}"
+  bucket = "${var.project_name}-${var.bucket_name}-s3"
   tags   = local.common_tags
 }
 
@@ -193,7 +193,7 @@ resource "aws_s3_bucket_logging" "bucket_logging" {
 
   bucket = aws_s3_bucket.this.id
 
-  target_bucket = "${var.project_name}-${var.s3_access_logs_bucket_name}-${var.env}"
+  target_bucket = "${var.project_name}-${var.s3_access_logs_bucket_name}-s3"
   target_prefix = "${var.bucket_name}/"
 }
 
