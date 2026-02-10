@@ -197,7 +197,7 @@ resource "aws_s3_bucket" "replication_bucket" {
 }
 
 resource "aws_s3_bucket_versioning" "replication_versioning" {
-  bucket = aws_s3_bucket.replication_bucket.id
+  bucket = local.replication_bucket_id
   versioning_configuration {
     status     = var.enable_versioning ? "Enabled" : "Suspended"
     mfa_delete = var.mfa_delete
@@ -242,6 +242,7 @@ resource "aws_s3_bucket_policy" "cc_deny_http" {
 
 locals {
   replication_bucket_arn = var.enable_replication ? aws_s3_bucket.replication_bucket[0].arn : null
+  replication_bucket_id  = var.enable_replication ? aws_s3_bucket.replication_bucket[0].id : null
   common_tags = merge(
     {
       environment  = var.environment
