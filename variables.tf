@@ -128,3 +128,9 @@ variable "mfa_delete" {
   default     = false
   description = "Enable MFA delete for either changing the versioning state of your bucket or permanently deleting an object version."
 }
+
+variable "enable_replication" {
+  type        = bool
+  default     = false
+  description = "Enable or Disable S3 bucket replication."
+}

@@ -138,8 +138,9 @@ resource "aws_iam_role" "cc_s3_replication_role" {
 }
 
 resource "aws_iam_role_policy" "cc_s3_replication_policy" {
-  name = var.iam_role_policy_name
-  role = aws_iam_role.cc_s3_replication_role.id
+  count = var.enable_replication ? 1 : 0
+  name  = var.iam_role_policy_name
+  role  = aws_iam_role.cc_s3_replication_role.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -164,9 +165,9 @@ resource "aws_iam_role_policy" "cc_s3_replication_policy" {
 
 
 resource "aws_s3_bucket_replication_configuration" "cc_bucket_replication_rule" {
-  depends_on = [aws_s3_bucket_versioning.this]
-  bucket     = aws_s3_bucket.this.id
-  role       = aws_iam_role.cc_s3_replication_role.arn
+  count  = var.enable_replication ? 1 : 0
+  bucket = aws_s3_bucket.this.id
+  role   = aws_iam_role.cc_s3_replication_role.arn
   rule {
     id = var.replication_rule
 
