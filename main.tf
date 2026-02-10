@@ -196,7 +196,7 @@ resource "aws_s3_bucket" "replication_bucket" {
   tags   = local.common_tags
 }
 
-resource "aws_s3_bucket_versioning" "this" {
+resource "aws_s3_bucket_versioning" "replication_versioning" {
   bucket = aws_s3_bucket.replication_bucket.id
   versioning_configuration {
     status     = var.enable_versioning ? "Enabled" : "Suspended"
