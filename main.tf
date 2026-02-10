@@ -31,7 +31,7 @@ resource "aws_kms_alias" "s3" {
 }
 
 resource "aws_sns_topic" "event_topic" {
-  name              = "s3-event-notification-topic"
+  name              = "${var.project_name}-${var.bucket_name}-${var.environment}-topic"
   kms_master_key_id = "alias/aws/sns"
   tags              = local.common_tags
 
