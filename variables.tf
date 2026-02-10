@@ -107,16 +107,6 @@ variable "destination_bucket" {
   }
 }
 
-variable "iam_role" {
-  type        = string
-  description = "Name of the role. If omitted, Terraform will assign a random, unique name"
-}
-
-variable "iam_role_policy_name" {
-  type        = string
-  description = "Name of the IAM Role Policy."
-}
-
 variable "enable_access_logs_bucket" {
   type        = bool
   default     = true
