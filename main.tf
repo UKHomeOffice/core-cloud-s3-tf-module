@@ -120,7 +120,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 }
 
 resource "aws_iam_role" "cc_s3_replication_role" {
-  name = var.iam_role
+  name = "${var.project_name}-${var.bucket_name}-${var.environment}-role"
   tags = local.common_tags
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
@@ -139,7 +139,7 @@ resource "aws_iam_role" "cc_s3_replication_role" {
 
 resource "aws_iam_role_policy" "cc_s3_replication_policy" {
   count = var.enable_replication ? 1 : 0
-  name  = var.iam_role_policy_name
+  name  = "${var.project_name}-${var.bucket_name}-${var.environment}-policy"
   role  = aws_iam_role.cc_s3_replication_role.id
 
   policy = jsonencode({
