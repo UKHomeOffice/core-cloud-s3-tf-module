@@ -174,7 +174,7 @@ resource "aws_s3_bucket_replication_configuration" "cc_bucket_replication_rule" 
     filter {}
 
     destination {
-      bucket        = aws_s3_bucket.replication_bucket.arn
+      bucket        = local.replication_bucket_arn
       storage_class = "STANDARD-IA"
 
       metrics {
@@ -241,6 +241,7 @@ resource "aws_s3_bucket_policy" "cc_deny_http" {
 
 
 locals {
+  replication_bucket_arn = var.enable_replication ? aws_s3_bucket.replication_bucket[0].arn : null
   common_tags = merge(
     {
       environment  = var.environment
