@@ -174,7 +174,7 @@ resource "aws_s3_bucket_replication_configuration" "cc_bucket_replication_rule" 
 
     destination {
       bucket        = var.destination_bucket
-      storage_class = "STANDARD"
+      storage_class = "STANDARD-IA"
 
       metrics {
         status = "Enabled"
