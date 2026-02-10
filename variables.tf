@@ -123,12 +123,6 @@ variable "enable_access_logs_bucket" {
   description = "Whether s3 server access logging should be enabled."
 }
 
-variable "s3_access_logs_bucket_name" {
-  type        = string
-  default     = "s3-access-logs"
-  description = "Name of the s3 bucket to store access logs."
-}
-
 variable "mfa_delete" {
   type        = bool
   default     = false

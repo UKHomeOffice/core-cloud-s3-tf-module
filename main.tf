@@ -194,8 +194,8 @@ resource "aws_s3_bucket_logging" "bucket_logging" {
 
   bucket = aws_s3_bucket.this.id
 
-  target_bucket = "${var.project_name}-${var.s3_access_logs_bucket_name}-${var.environment}"
-  target_prefix = "${var.bucket_name}/"
+  target_bucket = "${var.project_name}-${var.bucket_name}-${var.environment}-logs"
+  target_prefix = "${var.project_name}-${var.bucket_name}-${var.environment}/"
 }
 
 data "aws_iam_policy_document" "cc_https_policy" {
