@@ -174,7 +174,7 @@ resource "aws_s3_bucket_replication_configuration" "cc_bucket_replication_rule" 
     filter {}
 
     destination {
-      bucket        = local.replication_bucket_arn
+      bucket        = var.destination_bucket
       storage_class = "STANDARD-IA"
 
       metrics {
@@ -187,20 +187,6 @@ resource "aws_s3_bucket_replication_configuration" "cc_bucket_replication_rule" 
     }
 
     status = "Enabled"
-  }
-}
-
-resource "aws_s3_bucket" "replication_bucket" {
-  count  = var.enable_replication ? 1 : 0
-  bucket = "${var.project_name}-${var.bucket_name}-${var.environment}-replica"
-  tags   = local.common_tags
-}
-
-resource "aws_s3_bucket_versioning" "replication_versioning" {
-  bucket = local.replication_bucket_id
-  versioning_configuration {
-    status     = var.enable_versioning ? "Enabled" : "Suspended"
-    mfa_delete = var.mfa_delete
   }
 }
 
@@ -241,8 +227,6 @@ resource "aws_s3_bucket_policy" "cc_deny_http" {
 
 
 locals {
-  replication_bucket_arn = var.enable_replication ? aws_s3_bucket.replication_bucket[0].arn : null
-  replication_bucket_id  = var.enable_replication ? aws_s3_bucket.replication_bucket[0].id : null
   common_tags = merge(
     {
       environment  = var.environment

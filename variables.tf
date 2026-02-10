@@ -97,6 +97,16 @@ variable "replication_rule" {
   }
 }
 
+variable "destination_bucket" {
+  type        = string
+  description = "The ARN of the existing s3 bucket to replicate generated reports to."
+
+  validation {
+    condition     = length(var.destination_bucket) >= 1 && length(var.destination_bucket) <= 256
+    error_message = "The destination_bucket ARN must be less than 256 characters."
+  }
+}
+
 variable "iam_role" {
   type        = string
   description = "Name of the role. If omitted, Terraform will assign a random, unique name"
