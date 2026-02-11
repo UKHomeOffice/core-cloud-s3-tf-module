@@ -40,6 +40,7 @@ variable "tags" {
 
   validation {
     condition = alltrue([
+      contains(keys(var.tags), "account-code"),
       contains(keys(var.tags), "cost-centre"),
       contains(keys(var.tags), "portfolio-id"),
       contains(keys(var.tags), "project-id"),
