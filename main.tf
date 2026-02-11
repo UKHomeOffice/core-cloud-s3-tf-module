@@ -16,7 +16,7 @@ resource "aws_kms_key_policy" "bucket_kms_policy" {
         "Sid" : "EnableIAMUserPermissions",
         "Effect" : "Allow",
         "Principal" : {
-          "AWS" : "arn:aws:iam::${var.tags.account-code}:root"
+          "AWS" : "arn:aws:iam::${var.account-code}:root"
         },
         "Action" : "kms:*",
         "Resource" : "*"
@@ -42,7 +42,7 @@ resource "aws_sns_topic" "event_topic" {
         "Effect": "Allow",
         "Principal": {"AWS":"*"},
         "Action": "SNS:Publish",
-        "Resource": "arn:aws:sns:${var.region}:${var.tags.account-code}:s3-event-notification-topic",
+        "Resource": "arn:aws:sns:${var.region}:${var.account-code}:s3-event-notification-topic",
         "Condition":{
             "ArnLike":{"aws:SourceArn":"${aws_s3_bucket.this.arn}"}
         }
@@ -121,7 +121,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
 resource "aws_iam_role" "cc_s3_replication_role" {
   name = "${var.project_name}-${var.bucket_name}-${var.environment}-role"
-  tags = local.common_tags
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
