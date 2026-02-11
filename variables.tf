@@ -90,6 +90,7 @@ variable "days_after_initiation" {
 variable "replication_rule" {
   type        = string
   description = "The name of the replication rule applied to S3"
+  default     = ""
 
   validation {
     condition     = length(var.replication_rule) >= 1 && length(var.replication_rule) <= 256
@@ -100,6 +101,7 @@ variable "replication_rule" {
 variable "destination_bucket" {
   type        = string
   description = "The ARN of the existing s3 bucket to replicate generated reports to."
+  default     = ""
 
   validation {
     condition     = length(var.destination_bucket) >= 1 && length(var.destination_bucket) <= 256
