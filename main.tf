@@ -120,8 +120,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 }
 
 resource "aws_iam_role" "cc_s3_replication_role" {
-  count = var.enable_replication ? 1 : 0
-  name  = "${var.project_name}-${var.bucket_name}-${var.environment}-role"
+  name = "${var.project_name}-${var.bucket_name}-${var.environment}-role"
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
