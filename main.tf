@@ -100,7 +100,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
   rule {
     id     = "cc-bucket-lifecycle-rule"
     status = "Enabled"
-
+    filter {}
     expiration {
       days = var.lifecycle_expiration_days
     }
