@@ -20,7 +20,7 @@ resource "aws_kms_key_policy" "bucket_kms_policy" {
         },
         "Action" : "kms:*",
         "Resource" : "*"
-      },
+      }
     ]
   })
 }
