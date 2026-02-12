@@ -248,7 +248,6 @@ locals {
       Environment = var.environment
       Project     = var.project_name
       ManagedBy   = "terraform"
-      source-repo = var.source_repo
     },
     var.tags
   )

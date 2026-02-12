@@ -66,11 +66,6 @@ variable "encryption_type" {
   }
 }
 
-variable "source_repo" {
-  description = "The GitHub repository that made the AWS S3"
-  type        = string
-}
-
 variable "account_code" {
   description = "The AWS Account code."
   type        = string
