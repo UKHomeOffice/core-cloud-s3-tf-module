@@ -66,8 +66,8 @@ variable "encryption_type" {
   }
 }
 
-variable "account_code" {
-  description = "The AWS Account code."
+variable "account_id" {
+  description = "The AWS Account ID."
   type        = string
 }
 
