@@ -16,7 +16,7 @@ resource "aws_kms_key_policy" "bucket_kms_policy" {
         "Sid" : "EnableIAMUserPermissions",
         "Effect" : "Allow",
         "Principal" : {
-          "AWS" : "arn:aws:iam::${var.account-code}:root"
+          "AWS" : "arn:aws:iam::${var.account_code}:root"
         },
         "Action" : "kms:*",
         "Resource" : "*"
@@ -43,7 +43,7 @@ resource "aws_sns_topic" "event_topic" {
         "Effect": "Allow",
         "Principal": {"AWS":"*"},
         "Action": "SNS:Publish",
-        "Resource": "arn:aws:sns:${var.region}:${var.account-code}:s3-event-notification-topic",
+        "Resource": "arn:aws:sns:${var.region}:${var.account_code}:s3-event-notification-topic",
         "Condition":{
             "ArnLike":{"aws:SourceArn":"${aws_s3_bucket.this.arn}"}
         }
@@ -248,7 +248,7 @@ locals {
       Environment = var.environment
       Project     = var.project_name
       ManagedBy   = "terraform"
-      source-repo = var.source-repo
+      source-repo = var.source_repo
     },
     var.tags
   )
