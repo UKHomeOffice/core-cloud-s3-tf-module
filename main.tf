@@ -211,7 +211,7 @@ resource "aws_s3_bucket" "logs" {
 resource "aws_s3_bucket_logging" "bucket_logging" {
   count         = var.enable_access_logs_bucket ? 1 : 0
   bucket        = aws_s3_bucket.this.id
-  target_bucket = aws_s3_bucket.logs.id
+  target_bucket = aws_s3_bucket.logs[count.index].id
   target_prefix = "access-logs/"
 }
 
