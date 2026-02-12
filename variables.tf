@@ -72,8 +72,8 @@ variable "source-repo" {
 }
 
 variable "account-code" {
-  description = "The GitHub repository that made the AWS S3"
-  type        = string
+  description = "The AWS Account code."
+  type        = number
 }
 
 variable "lifecycle_expiration_days" {
@@ -116,4 +116,10 @@ variable "enable_replication" {
   type        = bool
   default     = false
   description = "Enable or Disable S3 bucket replication."
+}
+
+variable "email_address" {
+  type        = string
+  default     = ""
+  description = "Shared project mailbox."
 }

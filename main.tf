@@ -20,10 +20,11 @@ resource "aws_kms_key_policy" "bucket_kms_policy" {
         },
         "Action" : "kms:*",
         "Resource" : "*"
-      }
+      },
     ]
   })
 }
+
 
 resource "aws_kms_alias" "s3" {
   name          = "alias/${var.kms_alias}"
@@ -51,9 +52,22 @@ resource "aws_sns_topic" "event_topic" {
 POLICY
 }
 
+resource "aws_sns_topic_subscription" "topic-email-subscription" {
+  topic_arn = aws_sns_topic.event_topic.arn
+  protocol  = "email"
+  endpoint  = var.email_address
+}
+
 resource "aws_s3_bucket" "this" {
   bucket = "${var.project_name}-${var.bucket_name}-${var.environment}"
   tags   = local.common_tags
+}
+
+resource "aws_s3_bucket_ownership_controls" "bucket_ownership" {
+  bucket = aws_s3_bucket.this.id
+  rule {
+    object_ownership = "BucketOwnerEnforced"
+  }
 }
 
 resource "aws_s3_bucket_public_access_block" "this" {
@@ -81,12 +95,12 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
       kms_master_key_id = var.encryption_type == "aws:kms" ? aws_kms_key.s3.arn : null
       sse_algorithm     = var.encryption_type
     }
+    bucket_key_enabled = true
   }
 }
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
   bucket = aws_s3_bucket.this.id
-
   topic {
     topic_arn     = aws_sns_topic.event_topic.arn
     events        = ["s3:ObjectCreated:*", "s3:ObjectRemoved:*"]
@@ -189,13 +203,16 @@ resource "aws_s3_bucket_replication_configuration" "cc_bucket_replication_rule" 
   }
 }
 
+resource "aws_s3_bucket" "logs" {
+  count  = var.enable_access_logs_bucket ? 1 : 0
+  bucket = "${var.project_name}-${var.bucket_name}-${var.environment}-logs"
+}
+
 resource "aws_s3_bucket_logging" "bucket_logging" {
-  count = var.enable_access_logs_bucket ? 1 : 0
-
-  bucket = aws_s3_bucket.this.id
-
-  target_bucket = "${var.project_name}-${var.bucket_name}-${var.environment}-logs"
-  target_prefix = "${var.project_name}-${var.bucket_name}-${var.environment}/"
+  count         = var.enable_access_logs_bucket ? 1 : 0
+  bucket        = aws_s3_bucket.this.id
+  target_bucket = aws_s3_bucket.logs.id
+  target_prefix = "access-logs/"
 }
 
 data "aws_iam_policy_document" "cc_https_policy" {
