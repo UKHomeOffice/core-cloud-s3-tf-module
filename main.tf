@@ -56,7 +56,7 @@ POLICY
 
 resource "aws_sns_topic_subscription" "topic-email-subscription" {
   count     = var.enable_event_notifications ? 1 : 0
-  topic_arn = aws_sns_topic.event_topic.arn
+  topic_arn = aws_sns_topic.event_topic[count.index].arn
   protocol  = "email"
   endpoint  = var.email_address
 }
@@ -106,7 +106,7 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
   depends_on = [aws_sns_topic.event_topic]
   bucket     = aws_s3_bucket.this.id
   topic {
-    topic_arn = aws_sns_topic.event_topic.arn
+    topic_arn = aws_sns_topic.event_topic[count.index].arn
     events    = ["s3:ObjectCreated:*"]
   }
 }
