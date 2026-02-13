@@ -97,7 +97,7 @@ variable "destination_bucket" {
 
 variable "enable_access_logs_bucket" {
   type        = bool
-  default     = true
+  default     = false
   description = "Whether s3 server access logging should be enabled."
 }
 

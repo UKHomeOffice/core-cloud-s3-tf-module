@@ -204,8 +204,8 @@ resource "aws_s3_bucket_replication_configuration" "cc_bucket_replication_rule" 
 }
 
 resource "aws_s3_bucket" "logs" {
-  count  = var.enable_access_logs_bucket ? 1 : 0
-  bucket = "${var.project_name}-${var.bucket_name}-${var.environment}-logs"
+  for_each = var.enable_access_logs_bucket ? toset(["${var.project_name}-${var.bucket_name}-${var.environment}-logs"]) : []
+  bucket   = each.value
 }
 
 resource "aws_s3_bucket_logging" "bucket_logging" {
