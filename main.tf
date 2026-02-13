@@ -210,8 +210,8 @@ resource "aws_s3_bucket" "logs" {
 
 resource "aws_s3_bucket_logging" "bucket_logging" {
   depends_on    = [aws_s3_bucket.logs]
-  bucket        = aws_s3_bucket.this.id
-  target_bucket = aws_s3_bucket.logs.id
+  bucket        = "${var.project_name}-${var.bucket_name}-${var.environment}"
+  target_bucket = "${var.project_name}-${var.bucket_name}-${var.environment}-logs"
   target_prefix = "access-logs/"
 }
 
