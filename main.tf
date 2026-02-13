@@ -103,8 +103,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
 }
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
-  depends_on = [aws_sns_topic.event_topic]
-  bucket     = aws_s3_bucket.this.id
+  count  = var.enable_event_notifications ? 1 : 0
+  bucket = aws_s3_bucket.this.id
   topic {
     topic_arn = aws_sns_topic.event_topic[count.index].arn
     events    = ["s3:ObjectCreated:*"]
