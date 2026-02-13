@@ -45,8 +45,9 @@ resource "aws_sns_topic" "event_topic" {
         "Action": "SNS:Publish",
         "Resource": "arn:aws:sns:${var.region}:${var.account_id}:s3-event-notification-topic",
         "Condition":{
-            "ArnLike":{"aws:SourceArn":"${aws_s3_bucket.this.arn}"}
-        }
+          "StringEquals":{"aws:SourceAccount":"${var.account_id}"},
+          "ArnLike":{"aws:SourceArn":"${aws_s3_bucket.this.arn}"}
+        }      
     }]
 }
 POLICY
