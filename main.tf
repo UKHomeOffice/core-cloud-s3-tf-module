@@ -210,7 +210,7 @@ resource "aws_s3_bucket" "logs" {
 }
 
 resource "aws_s3_bucket_logging" "bucket_logging" {
-  depends_on    = [aws_s3_bucket.logs]
+  count         = var.enable_access_logs_bucket ? 1 : 0
   bucket        = "${var.project_name}-${var.bucket_name}-${var.environment}"
   target_bucket = "${var.project_name}-${var.bucket_name}-${var.environment}-logs"
   target_prefix = "access-logs/"
