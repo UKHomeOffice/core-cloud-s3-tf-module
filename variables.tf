@@ -118,9 +118,3 @@ variable "email_address" {
   default     = ""
   description = "Shared project mailbox."
 }
-
-variable "enable_event_notifications" {
-  type        = bool
-  default     = true
-  description = "Enable or Disable S3 bucket event notifications."
-}
