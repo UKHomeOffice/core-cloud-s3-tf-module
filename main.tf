@@ -16,7 +16,7 @@ resource "aws_kms_key_policy" "bucket_kms_policy" {
         "Sid" : "EnableIAMUserPermissions",
         "Effect" : "Allow",
         "Principal" : {
-          "AWS" : "arn:aws:iam::${var.account-code}:root"
+          "AWS" : "arn:aws:iam::${var.account_id}:root"
         },
         "Action" : "kms:*",
         "Resource" : "*"
@@ -24,6 +24,7 @@ resource "aws_kms_key_policy" "bucket_kms_policy" {
     ]
   })
 }
+
 
 resource "aws_kms_alias" "s3" {
   name          = "alias/${var.kms_alias}"
@@ -40,20 +41,34 @@ resource "aws_sns_topic" "event_topic" {
     "Version":"2012-10-17",
     "Statement":[{
         "Effect": "Allow",
-        "Principal": {"AWS":"*"},
+        "Principal": { "Service": "s3.amazonaws.com" },
         "Action": "SNS:Publish",
-        "Resource": "arn:aws:sns:${var.region}:${var.account-code}:s3-event-notification-topic",
+        "Resource": "arn:aws:sns:${var.region}:${var.account_id}:${var.project_name}-${var.bucket_name}-${var.environment}-topic",
         "Condition":{
-            "ArnLike":{"aws:SourceArn":"${aws_s3_bucket.this.arn}"}
-        }
+          "StringEquals":{"aws:SourceAccount":"${var.account_id}"},
+          "ArnLike":{"aws:SourceArn":"${aws_s3_bucket.this.arn}"}
+        }      
     }]
 }
 POLICY
 }
 
+resource "aws_sns_topic_subscription" "topic-email-subscription" {
+  topic_arn = aws_sns_topic.event_topic.arn
+  protocol  = "email"
+  endpoint  = var.email_address
+}
+
 resource "aws_s3_bucket" "this" {
   bucket = "${var.project_name}-${var.bucket_name}-${var.environment}"
   tags   = local.common_tags
+}
+
+resource "aws_s3_bucket_ownership_controls" "bucket_ownership" {
+  bucket = aws_s3_bucket.this.id
+  rule {
+    object_ownership = "BucketOwnerEnforced"
+  }
 }
 
 resource "aws_s3_bucket_public_access_block" "this" {
@@ -81,16 +96,15 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
       kms_master_key_id = var.encryption_type == "aws:kms" ? aws_kms_key.s3.arn : null
       sse_algorithm     = var.encryption_type
     }
+    bucket_key_enabled = true
   }
 }
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
   bucket = aws_s3_bucket.this.id
-
   topic {
-    topic_arn     = aws_sns_topic.event_topic.arn
-    events        = ["s3:ObjectCreated:*", "s3:ObjectRemoved:*"]
-    filter_suffix = ".log"
+    topic_arn = aws_sns_topic.event_topic.arn
+    events    = ["s3:ObjectCreated:*"]
   }
 }
 
@@ -100,7 +114,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
   rule {
     id     = "cc-bucket-lifecycle-rule"
     status = "Enabled"
-
+    filter {}
     expiration {
       days = var.lifecycle_expiration_days
     }
@@ -121,7 +135,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 
 resource "aws_iam_role" "cc_s3_replication_role" {
   name = "${var.project_name}-${var.bucket_name}-${var.environment}-role"
-  tags = local.common_tags
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -190,13 +203,17 @@ resource "aws_s3_bucket_replication_configuration" "cc_bucket_replication_rule" 
   }
 }
 
+resource "aws_s3_bucket" "logs" {
+  count  = var.enable_access_logs_bucket ? 1 : 0
+  bucket = "${var.project_name}-${var.bucket_name}-${var.environment}-logs"
+  tags   = local.common_tags
+}
+
 resource "aws_s3_bucket_logging" "bucket_logging" {
-  count = var.enable_access_logs_bucket ? 1 : 0
-
-  bucket = aws_s3_bucket.this.id
-
-  target_bucket = "${var.project_name}-${var.bucket_name}-${var.environment}-logs"
-  target_prefix = "${var.project_name}-${var.bucket_name}-${var.environment}/"
+  count         = var.enable_access_logs_bucket ? 1 : 0
+  bucket        = "${var.project_name}-${var.bucket_name}-${var.environment}-logs"
+  target_bucket = "${var.project_name}-${var.bucket_name}-${var.environment}"
+  target_prefix = "access-logs/"
 }
 
 data "aws_iam_policy_document" "cc_https_policy" {
@@ -225,15 +242,12 @@ resource "aws_s3_bucket_policy" "cc_deny_http" {
   policy = data.aws_iam_policy_document.cc_https_policy.json
 }
 
-
 locals {
   common_tags = merge(
     {
-      environment  = var.environment
-      project      = var.project_name
-      ManagedBy    = "terraform"
-      source-repo  = var.source-repo
-      account-code = var.account-code
+      Environment = var.environment
+      Project     = var.project_name
+      ManagedBy   = "terraform"
     },
     var.tags
   )
