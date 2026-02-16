@@ -40,6 +40,7 @@ variable "tags" {
 
   validation {
     condition = alltrue([
+      contains(keys(var.tags), "account-code"),
       contains(keys(var.tags), "cost-centre"),
       contains(keys(var.tags), "portfolio-id"),
       contains(keys(var.tags), "project-id"),
@@ -65,13 +66,8 @@ variable "encryption_type" {
   }
 }
 
-variable "source-repo" {
-  description = "The GitHub repository that made the AWS S3"
-  type        = string
-}
-
-variable "account-code" {
-  description = "The GitHub repository that made the AWS S3"
+variable "account_id" {
+  description = "The AWS Account ID."
   type        = string
 }
 
@@ -90,37 +86,35 @@ variable "days_after_initiation" {
 variable "replication_rule" {
   type        = string
   description = "The name of the replication rule applied to S3"
-
-  validation {
-    condition     = length(var.replication_rule) >= 1 && length(var.replication_rule) <= 256
-    error_message = "The replication_rule name must be less than 256 characters."
-  }
+  default     = ""
 }
 
 variable "destination_bucket" {
   type        = string
   description = "The ARN of the existing s3 bucket to replicate generated reports to."
-
-  validation {
-    condition     = length(var.destination_bucket) >= 1 && length(var.destination_bucket) <= 256
-    error_message = "The destination_bucket ARN must be less than 256 characters."
-  }
+  default     = ""
 }
 
 variable "enable_access_logs_bucket" {
   type        = bool
-  default     = true
+  default     = false
   description = "Whether s3 server access logging should be enabled."
 }
 
 variable "mfa_delete" {
-  type        = bool
-  default     = false
-  description = "Enable MFA delete for either changing the versioning state of your bucket or permanently deleting an object version."
+  type        = string
+  default     = "Disabled"
+  description = "Enable MFA delete for either changing the versioning state of your bucket or permanently deleting an object version. Value must be 'Enabled' or 'Disabled'."
 }
 
 variable "enable_replication" {
   type        = bool
   default     = false
   description = "Enable or Disable S3 bucket replication."
+}
+
+variable "email_address" {
+  type        = string
+  default     = ""
+  description = "Shared project mailbox."
 }
