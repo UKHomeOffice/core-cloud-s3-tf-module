@@ -32,6 +32,7 @@ resource "aws_kms_alias" "s3" {
 }
 
 resource "aws_sns_topic" "event_topic" {
+  count             = var.enable_event_notifications ? 1 : 0
   name              = "${var.project_name}-${var.bucket_name}-${var.environment}-topic"
   kms_master_key_id = "alias/aws/sns"
   tags              = local.common_tags
@@ -54,8 +55,7 @@ POLICY
 }
 
 resource "aws_sns_topic_subscription" "topic-email-subscription" {
-  count     = var.enable_event_notifications ? 1 : 0
-  topic_arn = aws_sns_topic.event_topic[count.index].arn
+  topic_arn = aws_sns_topic.event_topic[0].arn
   protocol  = "email"
   endpoint  = var.email_address
 }
@@ -104,7 +104,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
 resource "aws_s3_bucket_notification" "bucket_notification" {
   bucket = aws_s3_bucket.this.id
   topic {
-    topic_arn = aws_sns_topic.event_topic.arn
+    topic_arn = aws_sns_topic.event_topic[0].arn
     events    = ["s3:ObjectCreated:*"]
   }
 }
@@ -212,8 +212,8 @@ resource "aws_s3_bucket" "logs" {
 
 resource "aws_s3_bucket_logging" "bucket_logging" {
   count         = var.enable_access_logs_bucket ? 1 : 0
-  bucket        = "${var.project_name}-${var.bucket_name}-${var.environment}"
-  target_bucket = "${var.project_name}-${var.bucket_name}-${var.environment}-logs"
+  bucket        = "${var.project_name}-${var.bucket_name}-${var.environment}-logs"
+  target_bucket = "${var.project_name}-${var.bucket_name}-${var.environment}"
   target_prefix = "access-logs/"
 }
 
