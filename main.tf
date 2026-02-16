@@ -44,7 +44,7 @@ resource "aws_sns_topic" "event_topic" {
         "Effect": "Allow",
         "Principal": { "Service": "s3.amazonaws.com" },
         "Action": "SNS:Publish",
-        "Resource": "arn:aws:sns:${var.region}:${var.account_id}:s3-event-notification-topic",
+        "Resource": "arn:aws:sns:${var.region}:${var.account_id}:${var.project_name}-${var.bucket_name}-${var.environment}-topic",
         "Condition":{
           "StringEquals":{"aws:SourceAccount":"${var.account_id}"},
           "ArnLike":{"aws:SourceArn":"${aws_s3_bucket.this.arn}"}
@@ -103,10 +103,10 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
 }
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
-  count  = var.enable_event_notifications ? 1 : 0
+  depends_on = [ aws_sns_topic.event_topic ]
   bucket = aws_s3_bucket.this.id
   topic {
-    topic_arn = aws_sns_topic.event_topic[count.index].arn
+    topic_arn = aws_sns_topic.event_topic.arn
     events    = ["s3:ObjectCreated:*"]
   }
 }
