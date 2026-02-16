@@ -32,7 +32,6 @@ resource "aws_kms_alias" "s3" {
 }
 
 resource "aws_sns_topic" "event_topic" {
-  count             = var.enable_event_notifications ? 1 : 0
   name              = "${var.project_name}-${var.bucket_name}-${var.environment}-topic"
   kms_master_key_id = "alias/aws/sns"
   tags              = local.common_tags
@@ -103,10 +102,9 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
 }
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
-  depends_on = [aws_sns_topic.event_topic]
-  bucket     = aws_s3_bucket.this.id
+  bucket = aws_s3_bucket.this.id
   topic {
-    topic_arn = aws_sns_topic.event_topic[count.index].arn
+    topic_arn = aws_sns_topic.event_topic.arn
     events    = ["s3:ObjectCreated:*"]
   }
 }
