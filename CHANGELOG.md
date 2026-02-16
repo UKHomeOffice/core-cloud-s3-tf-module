@@ -2,6 +2,6 @@ All notable changes to this project will be documented in this file. This will p
 
 eg:
 
-### [0.0.1] 2025-11-27
+### [0.0.1] 2026-02-16
 
   * Initial tag created for Core Cloud S3 Terraform module
