@@ -217,7 +217,7 @@ resource "aws_s3_bucket_replication_configuration" "cc_bucket_replication_rule" 
     filter {}
     destination {
       bucket        = aws_s3_bucket.s3_replica.arn
-      storage_class = "STANDARD-IA"
+      storage_class = "STANDARD_IA"
 
       metrics {
         status = "Enabled"
