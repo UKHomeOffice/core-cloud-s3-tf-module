@@ -29,8 +29,8 @@ variable "kms_alias" {
 
 variable "enable_versioning" {
   description = "Enable versioning for the bucket"
-  type        = bool
-  default     = true
+  type        = string
+  default     = "Enabled"
 }
 
 variable "tags" {
