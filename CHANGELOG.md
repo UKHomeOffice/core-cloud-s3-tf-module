@@ -5,3 +5,7 @@ eg:
 ### [0.0.1] 2026-02-16
 
   * Initial tag created for Core Cloud S3 Terraform module
+
+### [0.0.2] 2026-02-17
+
+  * Adding default access logging and replication.
