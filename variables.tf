@@ -86,7 +86,7 @@ variable "days_after_initiation" {
 variable "replication_rule" {
   type        = string
   description = "The name of the replication rule applied to S3"
-  default     = ""
+  default     = "cc-default-replication-rule"
 }
 
 variable "destination_bucket" {
