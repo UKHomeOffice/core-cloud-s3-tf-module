@@ -95,12 +95,6 @@ variable "destination_bucket" {
   default     = ""
 }
 
-variable "enable_access_logs_bucket" {
-  type        = bool
-  default     = false
-  description = "Whether s3 server access logging should be enabled."
-}
-
 variable "mfa_delete" {
   type        = string
   default     = "Disabled"
