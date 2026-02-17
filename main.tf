@@ -149,7 +149,6 @@ data "aws_iam_policy_document" "cc_assume_role" {
 resource "aws_iam_role" "cc_s3_replication_role" {
   name               = "${var.project_name}-${var.bucket_name}-${var.environment}-replica-role"
   assume_role_policy = data.aws_iam_policy_document.cc_assume_role.json
-  tags               = local.common_tags
 }
 
 data "aws_iam_policy_document" "cc_s3_replication" {
