@@ -189,7 +189,7 @@ data "aws_iam_policy_document" "cc_s3_replication" {
 
 resource "aws_iam_policy" "s3_replication" {
   name   = "${var.project_name}-${var.bucket_name}-${var.environment}-replica-policy"
-  policy = data.aws_iam_policy_document.replication.json
+  policy = data.aws_iam_policy_document.cc_s3_replication.json
 }
 
 resource "aws_iam_role_policy_attachment" "s3_replication" {
