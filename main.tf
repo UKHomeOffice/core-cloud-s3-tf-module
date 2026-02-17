@@ -133,72 +133,100 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
   }
 }
 
+data "aws_iam_policy_document" "cc_assume_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
 resource "aws_iam_role" "cc_s3_replication_role" {
-  name = "${var.project_name}-${var.bucket_name}-${var.environment}-role"
-  assume_role_policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Action" : "sts:AssumeRole",
-        "Principal" : {
-          "Service" : "s3.amazonaws.com"
-        },
-        "Effect" : "Allow",
-        "Sid" : ""
-      }
-    ]
-  })
+  name               = "${var.project_name}-${var.bucket_name}-${var.environment}-replica-role"
+  assume_role_policy = data.aws_iam_policy_document.cc_assume_role.json
+  tags               = local.common_tags
 }
 
-resource "aws_iam_role_policy" "cc_s3_replication_policy" {
-  count = var.enable_replication ? 1 : 0
-  name  = "${var.project_name}-${var.bucket_name}-${var.environment}-policy"
-  role  = aws_iam_role.cc_s3_replication_role.id
+data "aws_iam_policy_document" "cc_s3_replication" {
+  statement {
+    effect = "Allow"
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        "Action" : [
-          "s3:GetReplicationConfiguration",
-          "s3:ListBucket",
-          "s3:GetObjectVersionForReplication",
-          "s3:GetObjectVersionAcl",
-          "s3:ReplicateObject",
-          "s3:ReplicateDelete",
-          "s3:ReplicateTags",
-          "s3:GetObjectVersionTagging"
-        ],
-        "Resource" : "${aws_s3_bucket.this.arn}/*",
-        "Effect" : "Allow"
-      }
+    actions = [
+      "s3:GetReplicationConfiguration",
+      "s3:ListBucket",
     ]
-  })
+    resources = [aws_s3_bucket.this.arn]
+  }
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObjectVersionForReplication",
+      "s3:GetObjectVersionAcl",
+      "s3:GetObjectVersionTagging",
+    ]
+
+    resources = ["${aws_s3_bucket.this.arn}/*"]
+  }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "s3:ReplicateObject",
+      "s3:ReplicateDelete",
+      "s3:ReplicateTags",
+    ]
+
+    resources = ["${aws_s3_bucket.s3_replica.arn}/*"]
+  }
 }
 
+resource "aws_iam_policy" "s3_replication" {
+  name   = "${var.project_name}-${var.bucket_name}-${var.environment}-replica-policy"
+  policy = data.aws_iam_policy_document.replication.json
+}
+
+resource "aws_iam_role_policy_attachment" "s3_replication" {
+  role       = aws_iam_role.cc_s3_replication_role.name
+  policy_arn = aws_iam_policy.s3_replication.arn
+}
+
+resource "aws_s3_bucket" "s3_replica" {
+  bucket = "${var.project_name}-${var.bucket_name}-${var.environment}-replica"
+  tags   = local.common_tags
+}
+
+resource "aws_s3_bucket_versioning" "s3_replica_destination" {
+  bucket = aws_s3_bucket.s3_replica.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
 
 resource "aws_s3_bucket_replication_configuration" "cc_bucket_replication_rule" {
-  count  = var.enable_replication ? 1 : 0
-  bucket = aws_s3_bucket.this.id
-  role   = aws_iam_role.cc_s3_replication_role.arn
+  depends_on = [aws_s3_bucket_versioning.s3_replica_destination]
+  bucket     = aws_s3_bucket.this.id
+  role       = aws_iam_role.cc_s3_replication_role.arn
   rule {
     id = var.replication_rule
-
     filter {}
-
     destination {
-      bucket        = var.destination_bucket
+      bucket        = aws_s3_bucket.s3_replica.arn
       storage_class = "STANDARD-IA"
 
       metrics {
         status = "Enabled"
       }
     }
-
     delete_marker_replication {
       status = "Enabled"
     }
-
     status = "Enabled"
   }
 }

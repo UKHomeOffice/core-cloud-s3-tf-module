@@ -101,12 +101,6 @@ variable "mfa_delete" {
   description = "Enable MFA delete for either changing the versioning state of your bucket or permanently deleting an object version. Value must be 'Enabled' or 'Disabled'."
 }
 
-variable "enable_replication" {
-  type        = bool
-  default     = false
-  description = "Enable or Disable S3 bucket replication."
-}
-
 variable "email_address" {
   type        = string
   default     = ""
