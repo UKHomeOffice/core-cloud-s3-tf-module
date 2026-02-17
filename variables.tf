@@ -86,31 +86,13 @@ variable "days_after_initiation" {
 variable "replication_rule" {
   type        = string
   description = "The name of the replication rule applied to S3"
-  default     = ""
-}
-
-variable "destination_bucket" {
-  type        = string
-  description = "The ARN of the existing s3 bucket to replicate generated reports to."
-  default     = ""
-}
-
-variable "enable_access_logs_bucket" {
-  type        = bool
-  default     = false
-  description = "Whether s3 server access logging should be enabled."
+  default     = "cc-default-replication-rule"
 }
 
 variable "mfa_delete" {
   type        = string
   default     = "Disabled"
   description = "Enable MFA delete for either changing the versioning state of your bucket or permanently deleting an object version. Value must be 'Enabled' or 'Disabled'."
-}
-
-variable "enable_replication" {
-  type        = bool
-  default     = false
-  description = "Enable or Disable S3 bucket replication."
 }
 
 variable "email_address" {
