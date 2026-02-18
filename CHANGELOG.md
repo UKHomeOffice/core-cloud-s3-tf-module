@@ -9,3 +9,7 @@ eg:
 ### [0.0.2] 2026-02-17
 
   * Adding default s3 access logging and replication configuration.
+
+### [0.0.3] 2026-02-18
+
+  * Updating module README with recommendations and usage.

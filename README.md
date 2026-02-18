@@ -32,8 +32,49 @@ Please refer to the [Official Hashicorp Terraform Test documentation](https://de
 
 ## Usage 
 
+Recommended settings:
+
+- Enable versioning.
+- Adhere to Core Cloud mandatory tags.
+- Opt into mfa delete when possible.
+- S3 Encryption type must be 'aws:kms' or 'AES256'.
+
+- Note: S3 Event notifications, access logging and replication is enabled by default when using this module. All public access will be blocked for the S3 bucket and all connections to S3 buckets created by this module use TLS.
+
+See the below example configuration (We recommend one file per s3 bucket when using this module):
+
+```
+terraform {
+  source = "git::https://github.com/UKHomeOffice/core-cloud-s3-tf-module.git?ref={tag}"
+}
+
+inputs = {
+
+  bucket_name                = "test-1"
+  kms_alias                  = "test-kms-key"
+  project_name               = "xxx"
+  environment                = "test"
+  encryption_type            = "aws:kms"
+  account_id                 = "xxxxx"
+  email_address              = "<project-shared-mailbox>"
 
 
+  # Tags for all resources
+  tags = {
+    environment      = "test"
+    project          = "xxx"
+    cost-centre      = "xxx"
+    account-code     = "xxx"
+    portfolio-id     = "xxx"
+    project-id       = "xxx"
+    service-id       = "xxx"
+    environment-type = "test"
+    owner-business   = "xxx"
+    budget-holder    = "xxx"
+  }
+}
+
+```
 
 ## Requirements
 
@@ -56,51 +97,56 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [aws_iam_role.cc_s3_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
-| [aws_iam_role_policy.cc_s3_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
+| [aws_iam_policy.s3_replication](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_role.cc_s3_replication_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role_policy_attachment.s3_replication](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_kms_alias.s3](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias) | resource |
 | [aws_kms_key.s3](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
 | [aws_kms_key_policy.bucket_kms_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key_policy) | resource |
+| [aws_s3_bucket.logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
+| [aws_s3_bucket.s3_replica](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
 | [aws_s3_bucket.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
 | [aws_s3_bucket_lifecycle_configuration.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_lifecycle_configuration) | resource |
 | [aws_s3_bucket_logging.bucket_logging](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_logging) | resource |
 | [aws_s3_bucket_notification.bucket_notification](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_notification) | resource |
+| [aws_s3_bucket_ownership_controls.bucket_ownership](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_ownership_controls) | resource |
 | [aws_s3_bucket_policy.cc_deny_http](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_policy) | resource |
+| [aws_s3_bucket_policy.logging](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_policy) | resource |
 | [aws_s3_bucket_public_access_block.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
 | [aws_s3_bucket_replication_configuration.cc_bucket_replication_rule](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_replication_configuration) | resource |
 | [aws_s3_bucket_server_side_encryption_configuration.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_server_side_encryption_configuration) | resource |
+| [aws_s3_bucket_versioning.s3_replica_destination](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_versioning) | resource |
 | [aws_s3_bucket_versioning.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_versioning) | resource |
 | [aws_sns_topic.event_topic](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sns_topic) | resource |
+| [aws_sns_topic_subscription.topic-email-subscription](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/sns_topic_subscription) | resource |
+| [aws_iam_policy_document.cc_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.cc_https_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.cc_logging_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.cc_s3_replication](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_account-code"></a> [account-code](#input\_account-code) | The GitHub repository that made the AWS S3 | `string` | n/a | yes |
+| <a name="input_account_id"></a> [account\_id](#input\_account\_id) | The AWS Account ID. | `string` | n/a | yes |
 | <a name="input_bucket_name"></a> [bucket\_name](#input\_bucket\_name) | Name of the S3 bucket | `string` | `""` | no |
 | <a name="input_days_after_initiation"></a> [days\_after\_initiation](#input\_days\_after\_initiation) | Specifies the number of days after initiating a multipart upload when the multipart upload must be completed. | `number` | `15` | no |
-| <a name="input_destination_bucket"></a> [destination\_bucket](#input\_destination\_bucket) | The ARN of the existing s3 bucket to replicate generated reports to. | `string` | n/a | yes |
-| <a name="input_enable_access_logs_bucket"></a> [enable\_access\_logs\_bucket](#input\_enable\_access\_logs\_bucket) | Whether s3 server access logging should be enabled. | `bool` | `true` | no |
+| <a name="input_email_address"></a> [email\_address](#input\_email\_address) | Shared project mailbox. | `string` | `""` | no |
 | <a name="input_enable_versioning"></a> [enable\_versioning](#input\_enable\_versioning) | Enable versioning for the bucket | `bool` | `true` | no |
 | <a name="input_encryption_type"></a> [encryption\_type](#input\_encryption\_type) | The server-side encryption algorithm to use. Valid values are 'aws:kms' or 'AES256'. AES256 is for SSE-S3 | `string` | `"aws:kms"` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment name | `string` | n/a | yes |
-| <a name="input_iam_role"></a> [iam\_role](#input\_iam\_role) | Name of the role. If omitted, Terraform will assign a random, unique name | `string` | n/a | yes |
-| <a name="input_iam_role_policy_name"></a> [iam\_role\_policy\_name](#input\_iam\_role\_policy\_name) | Name of the IAM Role Policy. | `string` | n/a | yes |
 | <a name="input_kms_alias"></a> [kms\_alias](#input\_kms\_alias) | KMS key alias for bucket encryption | `string` | n/a | yes |
 | <a name="input_lifecycle_expiration_days"></a> [lifecycle\_expiration\_days](#input\_lifecycle\_expiration\_days) | Number of days to keep s3 objects before expiration | `number` | `30` | no |
-| <a name="input_mfa_delete"></a> [mfa\_delete](#input\_mfa\_delete) | Enable MFA delete for either changing the versioning state of your bucket or permanently deleting an object version. | `bool` | `false` | no |
+| <a name="input_mfa_delete"></a> [mfa\_delete](#input\_mfa\_delete) | Enable MFA delete for either changing the versioning state of your bucket or permanently deleting an object version. Value must be 'Enabled' or 'Disabled'. | `string` | `"Disabled"` | no |
 | <a name="input_project_name"></a> [project\_name](#input\_project\_name) | Name of the project | `string` | `""` | no |
 | <a name="input_region"></a> [region](#input\_region) | AWS region | `string` | `"eu-west-2"` | no |
-| <a name="input_replication_rule"></a> [replication\_rule](#input\_replication\_rule) | The name of the replication rule applied to S3 | `string` | n/a | yes |
-| <a name="input_s3_access_logs_bucket_name"></a> [s3\_access\_logs\_bucket\_name](#input\_s3\_access\_logs\_bucket\_name) | Name of the s3 bucket to store access logs. | `string` | `"s3-access-logs"` | no |
-| <a name="input_source-repo"></a> [source-repo](#input\_source-repo) | The GitHub repository that made the AWS S3 | `string` | n/a | yes |
+| <a name="input_replication_rule"></a> [replication\_rule](#input\_replication\_rule) | The name of the replication rule applied to S3 | `string` | `"cc-default-replication-rule"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to be applied to the bucket | `map(string)` | `{}` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_bucket_arn"></a> [bucket\_arn](#output\_bucket\_arn) | The ARN of the bucket |
-| <a name="output_bucket_id"></a> [bucket\_id](#output\_bucket\_id) | The name of the bucket |
+| <a name="output_bucket_arn"></a> [bucket\_arn](#output\_bucket\_arn) | The ARN of the main bucket |
+| <a name="output_bucket_id"></a> [bucket\_id](#output\_bucket\_id) | The id of the main bucket |
 | <a name="output_kms_key_id"></a> [kms\_key\_id](#output\_kms\_key\_id) | The KMS Key ID of the bucket |
