@@ -96,12 +96,6 @@ variable "replication_rule" {
   default     = "cc-default-replication-rule"
 }
 
-variable "destination_bucket" {
-  type        = string
-  description = "The ARN of the existing s3 bucket to replicate generated reports to."
-  default     = ""
-}
-
 variable "mfa_delete" {
   type        = string
   default     = "Disabled"
