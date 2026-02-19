@@ -228,7 +228,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "replica" {
   }
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "this" {
+resource "aws_s3_bucket_lifecycle_configuration" "replica" {
   bucket = aws_s3_bucket.s3_replica.id
 
   rule {
@@ -308,7 +308,7 @@ resource "aws_s3_bucket_public_access_block" "logs" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "this" {
+resource "aws_s3_bucket_lifecycle_configuration" "logs" {
   bucket = aws_s3_bucket.logs.id
 
   rule {
@@ -400,7 +400,7 @@ data "aws_iam_policy_document" "cc_https_policy_replica" {
   }
 }
 
-resource "aws_s3_bucket_policy" "cc_deny_http" {
+resource "aws_s3_bucket_policy" "cc_deny_http_replica" {
   bucket = aws_s3_bucket.s3_replica.id
   policy = data.aws_iam_policy_document.cc_https_policy_replica.json
 }
@@ -426,7 +426,7 @@ data "aws_iam_policy_document" "cc_https_policy_logs" {
   }
 }
 
-resource "aws_s3_bucket_policy" "cc_deny_http" {
+resource "aws_s3_bucket_policy" "cc_deny_http_logs" {
   bucket = aws_s3_bucket.logs.id
   policy = data.aws_iam_policy_document.cc_https_policy_logs.json
 }
