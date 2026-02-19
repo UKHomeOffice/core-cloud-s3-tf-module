@@ -25,7 +25,6 @@ resource "aws_kms_key_policy" "bucket_kms_policy" {
   })
 }
 
-
 resource "aws_kms_alias" "s3" {
   name          = "alias/${var.kms_alias}"
   target_key_id = aws_kms_key.s3.id
@@ -133,7 +132,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
   }
 }
 
-
 data "aws_iam_policy_document" "cc_assume_role" {
   statement {
     effect = "Allow"
@@ -211,7 +209,7 @@ resource "aws_s3_bucket_public_access_block" "replica" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_versioning" "s3_replica_destination" {
+resource "aws_s3_bucket_versioning" "s3_replica_versioning" {
   bucket = aws_s3_bucket.s3_replica.id
   versioning_configuration {
     status = "Enabled"
@@ -256,7 +254,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
 }
 
 resource "aws_s3_bucket_replication_configuration" "cc_bucket_replication_rule" {
-  depends_on = [aws_s3_bucket_versioning.s3_replica_destination]
+  depends_on = [aws_s3_bucket_versioning.s3_replica_versioning]
   bucket     = aws_s3_bucket.this.id
   role       = aws_iam_role.cc_s3_replication_role.arn
   rule {
@@ -291,6 +289,13 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "logs" {
       sse_algorithm     = var.encryption_type
     }
     bucket_key_enabled = true
+  }
+}
+
+resource "aws_s3_bucket_versioning" "s3_logs_versioning" {
+  bucket = aws_s3_bucket.logs.id
+  versioning_configuration {
+    status = "Enabled"
   }
 }
 
