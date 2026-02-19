@@ -77,6 +77,13 @@ variable "lifecycle_expiration_days" {
   default     = 30
 }
 
+variable "lifecycle_expiration_days_logs" {
+  description = "Number of days to keep s3 objects in logging bucket before expiration"
+  type        = number
+  default     = 60
+}
+
+
 variable "days_after_initiation" {
   description = "Specifies the number of days after initiating a multipart upload when the multipart upload must be completed."
   default     = 15
