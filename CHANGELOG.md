@@ -13,3 +13,7 @@ eg:
 ### [0.0.3] 2026-02-18
 
   * Updating module README with recommendations and usage.
+
+### [0.0.4] 2026-02-19
+
+  * Adding default access settings for replica and logging buckets.
