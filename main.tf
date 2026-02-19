@@ -188,6 +188,7 @@ data "aws_iam_policy_document" "cc_s3_replication" {
 resource "aws_iam_policy" "s3_replication" {
   name   = "${var.project_name}-${var.bucket_name}-${var.environment}-replica-policy"
   policy = data.aws_iam_policy_document.cc_s3_replication.json
+  tags   = local.common_tags
 }
 
 resource "aws_iam_role_policy_attachment" "s3_replication" {
@@ -317,6 +318,18 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs" {
     filter {}
     expiration {
       days = var.lifecycle_expiration_days_logs
+    }
+  }
+
+  rule {
+    id     = "cc-abort-incomplete-multipart-uploads-logs"
+    status = "Enabled"
+
+    # No filter → applies to all multipart uploads
+    filter {}
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = var.days_after_initiation
     }
   }
 }
