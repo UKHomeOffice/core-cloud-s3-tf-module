@@ -77,6 +77,13 @@ variable "lifecycle_expiration_days" {
   default     = 30
 }
 
+variable "lifecycle_expiration_days_logs" {
+  description = "Number of days to keep s3 objects in logging bucket before expiration"
+  type        = number
+  default     = 60
+}
+
+
 variable "days_after_initiation" {
   description = "Specifies the number of days after initiating a multipart upload when the multipart upload must be completed."
   default     = 15
@@ -87,6 +94,12 @@ variable "replication_rule" {
   type        = string
   description = "The name of the replication rule applied to S3"
   default     = "cc-default-replication-rule"
+}
+
+variable "destination_bucket" {
+  type        = string
+  description = "The ARN of the existing s3 bucket to replicate generated reports to."
+  default     = ""
 }
 
 variable "mfa_delete" {

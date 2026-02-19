@@ -25,7 +25,6 @@ resource "aws_kms_key_policy" "bucket_kms_policy" {
   })
 }
 
-
 resource "aws_kms_alias" "s3" {
   name          = "alias/${var.kms_alias}"
   target_key_id = aws_kms_key.s3.id
@@ -201,7 +200,6 @@ resource "aws_s3_bucket" "s3_replica" {
   tags   = local.common_tags
 }
 
-
 resource "aws_s3_bucket_public_access_block" "replica" {
   bucket = aws_s3_bucket.s3_replica.id
 
@@ -211,15 +209,52 @@ resource "aws_s3_bucket_public_access_block" "replica" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_versioning" "s3_replica_destination" {
+resource "aws_s3_bucket_versioning" "s3_replica_versioning" {
   bucket = aws_s3_bucket.s3_replica.id
   versioning_configuration {
     status = "Enabled"
   }
 }
 
+resource "aws_s3_bucket_server_side_encryption_configuration" "replica" {
+  bucket = aws_s3_bucket.s3_replica.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = var.encryption_type == "aws:kms" ? aws_kms_key.s3.arn : null
+      sse_algorithm     = var.encryption_type
+    }
+    bucket_key_enabled = true
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "replica" {
+  bucket = aws_s3_bucket.s3_replica.id
+
+  rule {
+    id     = "cc-bucket-lifecycle-rule-replica"
+    status = "Enabled"
+    filter {}
+    expiration {
+      days = var.lifecycle_expiration_days
+    }
+  }
+
+  rule {
+    id     = "cc-abort-incomplete-multipart-uploads-replica"
+    status = "Enabled"
+
+    # No filter → applies to all multipart uploads
+    filter {}
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = var.days_after_initiation
+    }
+  }
+}
+
 resource "aws_s3_bucket_replication_configuration" "cc_bucket_replication_rule" {
-  depends_on = [aws_s3_bucket_versioning.s3_replica_destination]
+  depends_on = [aws_s3_bucket_versioning.s3_replica_versioning]
   bucket     = aws_s3_bucket.this.id
   role       = aws_iam_role.cc_s3_replication_role.arn
   rule {
@@ -245,6 +280,25 @@ resource "aws_s3_bucket" "logs" {
   tags   = local.common_tags
 }
 
+resource "aws_s3_bucket_server_side_encryption_configuration" "logs" {
+  bucket = aws_s3_bucket.logs.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = var.encryption_type == "aws:kms" ? aws_kms_key.s3.arn : null
+      sse_algorithm     = var.encryption_type
+    }
+    bucket_key_enabled = true
+  }
+}
+
+resource "aws_s3_bucket_versioning" "s3_logs_versioning" {
+  bucket = aws_s3_bucket.logs.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
 resource "aws_s3_bucket_public_access_block" "logs" {
   bucket = aws_s3_bucket.logs.id
 
@@ -254,13 +308,26 @@ resource "aws_s3_bucket_public_access_block" "logs" {
   restrict_public_buckets = true
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "logs" {
+  bucket = aws_s3_bucket.logs.id
+
+  rule {
+    id     = "cc-bucket-lifecycle-rule-logs"
+    status = "Enabled"
+    filter {}
+    expiration {
+      days = var.lifecycle_expiration_days_logs
+    }
+  }
+}
+
 data "aws_iam_policy_document" "cc_logging_bucket_policy" {
   statement {
     principals {
       identifiers = ["logging.s3.amazonaws.com"]
       type        = "Service"
     }
-    actions   = ["s3:PutObject"]
+    actions   = ["s3:PutObject", "s3:DeleteObject"]
     resources = ["${aws_s3_bucket.logs.arn}/*"]
     condition {
       test     = "StringEquals"
@@ -312,6 +379,57 @@ resource "aws_s3_bucket_policy" "cc_deny_http" {
   policy = data.aws_iam_policy_document.cc_https_policy.json
 }
 
+data "aws_iam_policy_document" "cc_https_policy_replica" {
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    effect = "Deny"
+    actions = [
+      "s3:*"
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+    resources = [
+      "${aws_s3_bucket.s3_replica.arn}/*",
+    ]
+  }
+}
+
+resource "aws_s3_bucket_policy" "cc_deny_http_replica" {
+  bucket = aws_s3_bucket.s3_replica.id
+  policy = data.aws_iam_policy_document.cc_https_policy_replica.json
+}
+
+data "aws_iam_policy_document" "cc_https_policy_logs" {
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    effect = "Deny"
+    actions = [
+      "s3:*"
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+    resources = [
+      "${aws_s3_bucket.logs.arn}/*",
+    ]
+  }
+}
+
+resource "aws_s3_bucket_policy" "cc_deny_http_logs" {
+  bucket = aws_s3_bucket.logs.id
+  policy = data.aws_iam_policy_document.cc_https_policy_logs.json
+}
 
 locals {
   common_tags = merge(

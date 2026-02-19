@@ -16,4 +16,4 @@ eg:
 
 ### [0.0.4] 2026-02-19
 
-  * Adding default access settings for replica and logging buckets.
+  * Updating README & Adding default access settings for replica and logging buckets.
