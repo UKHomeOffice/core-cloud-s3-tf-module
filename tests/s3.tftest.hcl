@@ -1,10 +1,10 @@
 // Mock providers to avoid real AWS/random calls during tests.
 mock_provider "aws" {
     override_data {
-        target = data.aws_iam_policy_document.cc_assume_role
-        values = {
-          json = "{}"
-        }
+      target = data.aws_iam_policy_document.cc_assume_role
+      values = {
+        json = "{}"
+      }
     }
 }
 
