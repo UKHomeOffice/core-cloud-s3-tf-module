@@ -9,7 +9,7 @@ on:
         required: true
   push:
     branches:
-      - CCL-7285-2
+      - main
   pull_request:
 
 permissions:
@@ -52,7 +52,7 @@ jobs:
         uses: UKHomeOffice/core-cloud-workflow-tflint-scan@main
 
   sonarqube-scanner:
-      uses: UKHomeOffice/core-cloud-workflow-sonarqube-scan/.github/workflows/sonarqube-scan.yaml@1.1.6
+      uses: UKHomeOffice/core-cloud-workflow-sonarqube-scan/.github/workflows/sonarqube-scan.yaml@1.1.7
       secrets:
         sonar_token: ${{ secrets.sonar_token }}
         sonar_host_url: ${{ secrets.sonar_host_url }}
