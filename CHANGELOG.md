@@ -17,3 +17,7 @@ eg:
 ### [0.0.4] 2026-02-19
 
   * Updating README & Adding default access settings for replica and logging buckets & Adding module tests.
+
+### [0.0.5] 2026-02-23
+
+  * Adding required tags to IAM Role.
