@@ -21,3 +21,7 @@ eg:
 ### [0.0.5] 2026-02-23
 
   * Adding required tags to IAM Role.
+
+### [0.0.6] 2026-02-24
+
+  * Adding required mandatory tag.
