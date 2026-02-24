@@ -44,11 +44,11 @@ variable "tags" {
       contains(keys(var.tags), "cost-centre"),
       contains(keys(var.tags), "portfolio-id"),
       contains(keys(var.tags), "project-id"),
-      contains(keys(var.tags), "portfolio-id"),
       contains(keys(var.tags), "service-id"),
       contains(keys(var.tags), "environment-type"),
       contains(keys(var.tags), "owner-business"),
-      contains(keys(var.tags), "budget-holder")
+      contains(keys(var.tags), "budget-holder"),
+      contains(keys(var.tags), "source-repo")
     ])
     error_message = "Tags must include all mandatory fields."
   }
