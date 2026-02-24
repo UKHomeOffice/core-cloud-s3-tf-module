@@ -44,11 +44,11 @@ variable "tags" {
       contains(keys(var.tags), "cost-centre"),
       contains(keys(var.tags), "portfolio-id"),
       contains(keys(var.tags), "project-id"),
-      contains(keys(var.tags), "portfolio-id"),
       contains(keys(var.tags), "service-id"),
       contains(keys(var.tags), "environment-type"),
       contains(keys(var.tags), "owner-business"),
-      contains(keys(var.tags), "budget-holder")
+      contains(keys(var.tags), "budget-holder"),
+      contains(keys(var.tags), "source-repo")
     ])
     error_message = "Tags must include all mandatory fields."
   }
@@ -94,12 +94,6 @@ variable "replication_rule" {
   type        = string
   description = "The name of the replication rule applied to S3"
   default     = "cc-default-replication-rule"
-}
-
-variable "destination_bucket" {
-  type        = string
-  description = "The ARN of the existing s3 bucket to replicate generated reports to."
-  default     = ""
 }
 
 variable "mfa_delete" {
