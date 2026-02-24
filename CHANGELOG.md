@@ -25,3 +25,7 @@ eg:
 ### [0.0.6] 2026-02-24
 
   * Adding required mandatory tag.
+
+### [0.0.7] 2026-02-24
+
+  * Adjusting module README usage tagging.
