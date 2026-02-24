@@ -29,3 +29,7 @@ eg:
 ### [0.0.7] 2026-02-24
 
   * Adjusting module README usage tagging.
+
+### [0.1.7] 2026-02-24
+
+  * updated checkov to allow for correct severity levels to be applied
