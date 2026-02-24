@@ -61,8 +61,6 @@ inputs = {
 
   # Tags for all resources
   tags = {
-    environment      = "test"
-    project          = "xxx"
     cost-centre      = "xxx"
     account-code     = "xxx"
     portfolio-id     = "xxx"
@@ -71,6 +69,7 @@ inputs = {
     environment-type = "test"
     owner-business   = "xxx"
     budget-holder    = "xxx"
+    source-repo      = "xxx"
   }
 }
 
