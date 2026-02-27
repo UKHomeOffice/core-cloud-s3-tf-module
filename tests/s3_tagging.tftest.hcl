@@ -163,11 +163,11 @@ run "validate_environment_values" {
   command = plan
 
   variables {
-    environment = "test-env-1"
+    environment = "test"
   }
 
   assert {
-    condition     = contains(["test-env-1", "test-env-2"], aws_s3_bucket.this.tags["Environment"])
-    error_message = "Environment tag should be one of: test-env-1 or test-env-2"
+    condition     = contains(["test"], aws_s3_bucket.this.tags["Environment"])
+    error_message = "Environment tag should be: test"
   }
 }
