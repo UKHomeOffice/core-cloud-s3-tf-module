@@ -89,7 +89,6 @@ run "validate_tag_values" {
   variables {
     environment  = "test"
     project_name = "test"
-    source-repo  = "github.com/UKHomeOffice/core-cloud-s3-tf-module"
   }
 
   assert {
@@ -106,11 +105,6 @@ run "validate_tag_values" {
     condition     = aws_s3_bucket.this.tags["ManagedBy"] == "terraform"
     error_message = "ManagedBy tag must be set to 'terraform'"
   }
-
-  assert {
-    condition     = aws_s3_bucket.this.tags["source-repo"] == "github.com/UKHomeOffice/core-cloud-s3-tf-module"
-    error_message = "source-repo tag must match the source-repo variable"
-  }
 }
 
 run "validate_additional_tags_merged" {
@@ -118,15 +112,19 @@ run "validate_additional_tags_merged" {
 
   variables {
     tags = {
-      Environment  = "test"
-      Project      = "testproject"
-      cost-centre  = "CC1000"
-      account-code = "AC1000"
-      portfolio-id = "PF1000"
-      project-id   = "PR1000"
-      service-id   = "SV1000"
-      CustomTag    = "CustomValue"
-    }
+      Environment      = "test"
+      Project          = "test"
+      cost-centre      = "CC1000"
+      account-code     = "AC1000"
+      portfolio-id     = "PF1000"
+      project-id       = "PR1000"
+      service-id       = "SV1000"
+      environment-type = "test"
+      owner-business   = "test"
+      budget-holder    = "testteam"
+      source-repo      = "UKHomeOffice/core-cloud-s3-tf-module"
+      CustomTag        = "CustomValue"
+   }
   }
 
   # Verify additional tags from var.tags are merged

@@ -38,8 +38,8 @@ run "validate_bucket_creation" {
   command = plan
 
   assert {
-    condition     = aws_s3_bucket.this.bucket == "testproject-testbucket-test-s3"
-    error_message = "S3 bucket name should follow pattern: {project_name}-{bucket_name}-{environment}-s3"
+    condition     = aws_s3_bucket.this.bucket == "testproject-testbucket-test"
+    error_message = "S3 bucket name should follow pattern: {project_name}-{bucket_name}-{environment}"
   }
 
   assert {
@@ -62,7 +62,7 @@ run "validate_kms_key_creation" {
   }
 
   assert {
-    condition     = aws_kms_key.s3.enable_key_rotation == false
+    condition     = aws_kms_key.s3.enable_key_rotation == true
     error_message = "KMS key rotation setting should match module default"
   }
 }
