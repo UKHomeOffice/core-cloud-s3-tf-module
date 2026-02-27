@@ -34,6 +34,6 @@ eg:
 
   * updated checkov to allow for correct severity levels to be applied
 
-### [0.1.7] 2026-02-27
+### [0.1.8] 2026-02-27
 
   * Adding s3 standard Terraform tests.
