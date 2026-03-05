@@ -42,11 +42,11 @@ run "kms_policy_test" {
   command = plan
 
   assert {
-    condition     = jsondecode(aws_kms_key_policy.kms_policy.policy)["Statement"][0]["Sid"] == "Enable IAM User Permissions"
+    condition     = jsondecode(aws_kms_key_policy.bucket_kms_policy.policy)["Statement"][0]["Sid"] == "Enable IAM User Permissions"
     error_message = "KMS policy must contain the Enable IAM User Permissions statement."
   }
   assert {
-    condition     = jsondecode(aws_kms_key_policy.kms_policy.policy)["Statement"][0]["Action"] == "kms:*"
+    condition     = jsondecode(aws_kms_key_policy.bucket_kms_policy.policy)["Statement"][0]["Action"] == "kms:*"
     error_message = "KMS policy must allow kms:* actions."
   }
 }
