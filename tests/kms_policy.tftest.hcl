@@ -22,6 +22,7 @@ variables {
   region          = "eu-west-2"
   source-repo     = "github.com/UKHomeOffice/core-cloud-s3-tf-module"
   email_address   = "test@test"
+  
   tags = {
     Environment      = "test"
     Project          = "test"
