@@ -1,11 +1,11 @@
 // Mock providers to avoid real AWS/random calls during tests.
 mock_provider "aws" {
-    override_data {
-        target = data.aws_iam_policy_document.cc_assume_role
-        values = {
-          json = "{}"
-        }
+  override_data {
+    target = data.aws_iam_policy_document.cc_assume_role
+    values = {
+      json = "{}"
     }
+  }
 }
 
 variables {
@@ -124,7 +124,7 @@ run "validate_additional_tags_merged" {
       budget-holder    = "testteam"
       source-repo      = "UKHomeOffice/core-cloud-s3-tf-module"
       CustomTag        = "CustomValue"
-   }
+    }
   }
 
   # Verify additional tags from var.tags are merged
