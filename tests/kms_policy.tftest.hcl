@@ -13,21 +13,27 @@ provider "aws" {
 }
 
 variables {
-  bucket_name  = "testbucket"
-  project_name = "testproject"
-  environment  = "test"
-  region       = "eu-west-2"
-  source-repo  = "github.com/UKHomeOffice/core-cloud-tooling-resources-terragrunt"
-  account_id   = "100000000000"
-
+  account_id      = "100000000000"
+  bucket_name     = "testbucket"
+  kms_alias       = "test-kms-key"
+  project_name    = "testproject"
+  environment     = "test"
+  encryption_type = "aws:kms"
+  region          = "eu-west-2"
+  source-repo     = "github.com/UKHomeOffice/core-cloud-s3-tf-module"
+  email_address   = "test@test"
   tags = {
-    Environment  = "test-ops-tooling"
-    Project      = "cc"
-    cost-centre  = "1709144"
-    account-code = "521835"
-    portfolio-id = "CTO"
-    project-id   = "CC"
-    service-id   = "QE"
+    Environment      = "test"
+    Project          = "test"
+    cost-centre      = "CC1000"
+    account-code     = "AC1000"
+    portfolio-id     = "PF1000"
+    project-id       = "PR1000"
+    service-id       = "SV1000"
+    environment-type = "test"
+    owner-business   = "test"
+    budget-holder    = "testteam"
+    source-repo      = "UKHomeOffice/core-cloud-s3-tf-module"
   }
 }
 
