@@ -41,3 +41,7 @@ eg:
 ### [0.1.9] 2026-03-27
 
   * Adding Dependabot workflow.
+
+### [0.1.10] 2026-03-27
+
+  * Adjusting Dependabot workflow Slack message.
