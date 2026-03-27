@@ -29,5 +29,5 @@ jobs:
         with:
           payload: |
             {
-              "text": "New ${{ github.repository}} Dependabot PR Available for Review:\n${{ github.event.pull_request.html_url }}"
+              "text": "New ${{ github.repository }} Dependabot PR Available for Review:\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
             }
