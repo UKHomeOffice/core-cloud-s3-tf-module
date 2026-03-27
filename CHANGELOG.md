@@ -37,3 +37,7 @@ eg:
 ### [0.1.8] 2026-02-27
 
   * Adding s3 standard Terraform tests.
+
+### [0.1.9] 2026-03-27
+
+  * Adding Dependabot workflow.
