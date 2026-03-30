@@ -45,3 +45,7 @@ eg:
 ### [0.1.10] 2026-03-27
 
   * Adjusting Dependabot workflow Slack message.
+
+### [0.1.11] 2026-03-30
+
+  * Adding weekly Terraform init and validate workflow.
