@@ -1,0 +1,30 @@
+name: Regular Terraform init and validate
+
+on:
+  schedule:
+    - cron: "0 10 * * 3"   # runs every Wednesday at 10:00 AM 
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  RunTerraformInitValidate:
+    name: Run Terraform Init and Validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone the Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+## hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@a1502cd9e758c50496cc9ac5308c4843bcd56d36
+        with:
+          terraform_version: ~1.9.0
+
+      - name: terraform init (no backend)
+        run: terraform init -backend=false
+
+      - name: terraform validate
+        run: terraform validate
